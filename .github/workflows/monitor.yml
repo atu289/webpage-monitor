@@ -1,0 +1,49 @@
+name: Monitor Webpage
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install requests
+        run: pip install requests
+
+      - name: Check webpage
+        id: check
+        run: python monitor.py
+
+      - name: Save hash
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add hash.txt
+          git commit -m "Update hash" || echo "No changes"
+          git push
+
+      - name: Send email if changed
+        if: steps.check.outputs.changed == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_HOST }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          to: ${{ secrets.ALERT_TO }}
+          from: "GitHub Monitor <${{ secrets.SMTP_USERNAME }}>"
+          subject: "Webpage changed: Ticketline Manchester Academy"
+          body: |
+            The webpage has changed:
+            ${{ steps.check.outputs.url }}
