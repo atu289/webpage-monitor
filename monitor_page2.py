@@ -2,7 +2,7 @@ import os
 import hashlib
 import requests
 
-URL = "https://www.bbc.co.uk/news/live/c7510l1135wt"
+URL = "https://www.fanticks.com/"
 HASH_FILE = "hash_page2.txt"
 
 def get_hash():
@@ -26,3 +26,8 @@ if "GITHUB_OUTPUT" in os.environ:
     with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
         f.write(f"changed={str(changed).lower()}\n")
         f.write(f"url={URL}\n")
+
+print("OLD_HASH:", old_hash)
+print("NEW_HASH:", new_hash)
+print("CHANGED:", changed)
+print("URL:", URL)
