@@ -2,12 +2,11 @@ name: Monitor Webpage
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/10 * * * *"
   workflow_dispatch:
 
-  permissions:
+permissions:
   contents: write
-
 
 jobs:
   monitor:
@@ -31,23 +30,8 @@ jobs:
 
       - name: Save hash
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase
           git add hash.txt
-          git commit -m "Update hash" || echo "No changes"
-          git push
-
-      - name: Send email if changed
-        if: steps.check.outputs.changed == 'true'
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: ${{ secrets.SMTP_HOST }}
-          server_port: ${{ secrets.SMTP_PORT }}
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          to: ${{ secrets.ALERT_TO }}
-          from: "GitHub Monitor <${{ secrets.SMTP_USERNAME }}>"
-          subject: "Webpage changed: Ticketline Manchester Academy"
-          body: |
-            The webpage has changed:
-            ${{ steps.check.outputs.url }}
+          git commit -m "
