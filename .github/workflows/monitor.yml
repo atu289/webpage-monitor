@@ -15,6 +15,9 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -32,6 +35,21 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase
           git add hash.txt
-          git commit -m "
+          git commit -m "Update hash" || echo "No changes"
+          git push origin main
+
+      - name: Send email if changed
+        if: steps.check.outputs.changed == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_HOST }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          to: ${{ secrets.ALERT_TO }}
+          from: "GitHub Monitor <${{ secrets.SMTP_USERNAME }}>"
+          subject: "Webpage changed: Ticketline Manchester Academy"
+          body: |
+            The webpage has changed:
+            ${{ steps.check.outputs.url }}
