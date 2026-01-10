@@ -2,7 +2,7 @@ import os
 import hashlib
 import requests
 
-URL = "https://www.ticketline.co.uk/venue/manchester-academy"
+URL = "https://www.ticketline.co.uk/event/unavailable/13378866/skye-newman-manchester-academy-2026-04-18-19-00-00"
 HASH_FILE = "hash.txt"
 
 def get_hash():
